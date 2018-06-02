@@ -25,8 +25,9 @@ do
 end
 
 do
+    local cnt=-1
     function new_mfile()
-        local cnt,fn=-1
+        local fn
         repeat cnt=cnt+1; fn="m/aa-"..cnt..".txt"
         until not file.exists(fn)
         return file.open(fn,"w")
