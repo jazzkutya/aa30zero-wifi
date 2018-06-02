@@ -49,6 +49,7 @@ end
 wifi.eventmon.register(wifi.eventmon.STA_GOT_IP,function (T)
     if wifistate==WIFI_AP or wifistate==WIFI_APF then return end
     setwifistate(WIFI_STAS)
+    mdns.register("aa")
     telnet_start()
     print("Got IP "..T.IP)
 end)
