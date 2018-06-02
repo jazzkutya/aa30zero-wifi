@@ -1,0 +1,50 @@
+
+
+antennaanalyser user interface
+
+
+meres gomb rovid nyomas
+ - merest vegrehajtja, led valahogy villog
+ - eredmenyt uj fileba elmenti. ezt lehet, hogy a meres kozben csinalja
+ - vegen eredmeny jelzes konstant szinnel:
+    - OK zold
+    - analyzer hiba piros
+    - nem sikerult a mentes fileba magenta?
+
+wifi bekapcsolas (wifi gomb rovid nyomas, amikor wifi station allapot kikapcsolt)
+ - legutolso mentett aphez kapcsolodik. ekozben villog a led
+    - siker - kek
+    - kudarc - piros
+       wifi station allapot: sikertelen bekapcsolt, gombnyomas -> kikapcsolt, vagyis nyugtazzuk a hibat
+       nyugtazas helyett wifi setup?
+
+wifi station allapot nem egyezik meg az esp8266 wifi station allapotaval, ez egy sajat allapotvaltozo, jelentese kb "miliyen wifi station allapotot
+akarunk es milyet sikerult"
+
+wifi kikapcsolas (wifi gomb rovid nyomas, amikor wifi station allapot nem kikapcsolt)
+ - station disconnect
+ - led off
+
+wifi setup (wifi gomb hosszu nyomas, esetleg sikertelen bekapcsolt allapotban rovid nyomasra is)
+ - station disconnect
+ - led - sarga vagy cian :)
+ - enduser_setup.start()
+    - onConnected -> mar fel is kapcsolodtunk az uj apre, led:=kek, wifi station allapot=siker
+    - onError -> magenta
+
+
+tehat a led jelzesek:
+villogas - muvelet folyamatban (meres - zold, wifi station - kek)
+measurement led:
+ - zold - utolso meres sikeres
+ - piros - analyzer hiba
+ - magenta - file io hiba
+lehetseges tovabbi jelzes: "tele a memoria"
+wifi led:
+ - kek - felcsattant az APre, weben megtekinthetok a rogzitett meresek / letolthetok
+ - piros - nem sikerult ezt elerni
+ - sarga - wifi setup
+ - magenta - wifi setup soran valamilyen hiba. ez vegulis lehet ugyanaz mint a piros (nem sikerult az apre felcsatlakozni)
+
+tovabbi lehetseges finomitasok:
+megkulonboztetni wifi ap csatlakozas hibajat es dhcp hibat
