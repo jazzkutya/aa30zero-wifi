@@ -24,6 +24,15 @@ do
     uart.write(0,"off\r\n")
 end
 
+do
+    function new_mfile()
+        local cnt,fn=-1
+        repeat cnt=cnt+1; fn="m/aa-"..cnt..".txt"
+        until not file.exists(fn)
+        return file.open(fn,"w")
+    end
+end
+
 -- ATTENTION do not print anything below this line except in callbacks that do not run now
 
 buttonsetup(P_MEAS_BTN,
