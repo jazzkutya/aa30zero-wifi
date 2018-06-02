@@ -1,31 +1,28 @@
 
 
 local defconfig={uart.getconfig(0)}
-local initresponse
-local initTO=tmr.create()
-local lcnt=0
-initTO:alarm(300,tmr.ALARM_SINGLE,function(timer)
-    uart.on("data")
-    uart.alt(0)
-    uart.setup(0,unpack(defconfig))
-    print("AA response timeout");
-    initTO=nil
-end)
-uart.alt(1)
-uart.on("data","\n",function(data)
-    if lcnt==1 then
+do
+    local initresponse
+    local initTO=tmr.create()
+    initTO:alarm(300,tmr.ALARM_SINGLE,function(timer)
+        uart.on("data")
+        uart.alt(0)
+        uart.setup(0,unpack(defconfig))
+        print("AA response timeout");
+        initTO=nil
+    end)
+    uart.alt(1)
+    uart.on("data","\n",function(data)
         uart.on("data")
         uart.alt(0)
         uart.setup(0,unpack(defconfig))
         initTO:unregister()
         initTO=nil;
         print("AA response: "..data);
-    end
-    lcnt=lcnt+1
+    end,0);
+    uart.setup(0,38400,8,uart.PARITY_NONE,uart.STOPBITS_1,0)
     uart.write(0,"off\r\n")
-end,0);
-uart.setup(0,38400,8,uart.PARITY_NONE,uart.STOPBITS_1,0)
-uart.write(0,"on\r\n")
+end
 
 -- ATTENTION do not print anything below this line except in callbacks that do not run now
 
