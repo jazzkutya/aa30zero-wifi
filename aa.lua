@@ -81,31 +81,6 @@ end
 buttonsetup(P_MEAS_BTN,
 function ()
     print("measurement butt short")
-    --[[
-    if wifistate==WIFI1_NULL or wifistate==WIFI_AP or wifistate==WIFI_APF then
-        wifi_start()
-        print("called wifi_start()")
-    elseif wifistate==WIFI_STAC or wifistate==WIFI_STAF or wifistate==WIFI_STAS then
-        wifi_stop()
-    end
-    ]]
-end,
-function ()
-    print("measurement butt long")
-    --[[
-    wifi_stop()
-    enduser_setup.start(
-    function()
-        print("Connected to wifi as:" .. wifi.sta.getip())
-        setwifistate(WIFI_STAS)
-        telnet_start()
-    end,
-    function(err,str)
-        print("enduser_setup: Err #" .. err .. ": " .. str)
-        setwifistate(WIFI_APF)
-    end,
-    print);
-    setwifistate(WIFI_AP)
-    ]]
+    m_start()
 end
 );

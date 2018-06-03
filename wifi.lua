@@ -122,8 +122,8 @@ function buttonsetup (pin,shortpress,longpress)
             expectdown=true
             gpio.trig(pin,"down")
             downtimer:stop()
-            if dt>700000 then longpress()
-            else shortpress() end
+            if longpress and dt>=700000 then longpress() end
+            if shortpress and dt<700000 then  shortpress() end
         end
     end)
 end
