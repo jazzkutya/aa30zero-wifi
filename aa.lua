@@ -2,7 +2,6 @@
 
 local defconfig={uart.getconfig(0)}
 do
-    local initresponse
     local initTO=tmr.create()
     initTO:alarm(300,tmr.ALARM_SINGLE,function(timer)
         uart.on("data")
@@ -35,10 +34,10 @@ do
     end
     local cmdi;
     function m_start()
+        if cmdi then return end-- measurement already in progress
         local uart_on,uart_alt,uart_setup,uart_write = uart.on,uart.alt,uart.setup,uart.write
         local string_byte,string_sub = string.byte,string.sub
 
-        if cmdi then return end-- measurement already in progress
         local f=new_mfile()
         local cmds={"VER\r\n","fq15000000\r\n","sw30000000\r\n","frx1000\r\n"}
         cmdi=1
@@ -51,7 +50,7 @@ do
             -- end of respone if:
             -- command is VER
             -- or data=="OK"
-            if (cmds[cmdi]=="VER" or data=="OK") then
+            if (cmds[cmdi]=="VER\r\n" or data=="OK") then
                 cmdi=cmdi+1
                 if cmdi > #cmds then
                     -- we executed all commands
