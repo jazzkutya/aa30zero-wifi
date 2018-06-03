@@ -26,11 +26,49 @@ end
 
 do
     local cnt=-1
+    local fn
     function new_mfile()
-        local fn
         repeat cnt=cnt+1; fn="m/aa-"..cnt..".txt"
         until not file.exists(fn)
         return file.open(fn,"w")
+    end
+    local cmdi;
+    function m_start()
+        if cmdi then return end-- measurement already in progress
+        local f=new_mfile()
+        local cmds={"VER\r\n","fq15000000\r\n","sw30000000\r\n","frx1000\r\n"}
+        cmdi=1
+        uart.alt(1)
+        uart.on("data","\n",function(data)
+            f:write("<"..data)
+            if string.byte(data)==13 then data=string.sub(data,2) end
+            if string.byte(data,-2)==13 then data=string.sub(data,1,-3)
+            else data=string.sub(data,1,-2) end
+            -- end of respone if:
+            -- command is VER
+            -- or data=="OK"
+            if (cmds[cmdi]=="VER" or data=="OK") then
+                cmdi=cmdi+1
+                if cmdi > #cmds then
+                    -- we executed all commands
+                    uart.on("data")
+                    uart.alt(0)
+                    uart.setup(0,unpack(defconfig))
+                    --initTO:unregister()
+                    --initTO=nil;
+                    cmdi=nil
+                    f:close()
+                    f=nil
+                    print("AA measurement finished. file: "..fn);
+                    return
+                end
+                f:write(">"..cmds[cmdi])
+                uart.write(0,cmds[cmdi])
+            end
+        end)
+        uart.setup(0,38400,8,uart.PARITY_NONE,uart.STOPBITS_1,0)
+        f:write(">"..cmds[cmdi])
+        uart.write(0,cmds[cmdi])
     end
 end
 
