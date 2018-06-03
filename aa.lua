@@ -28,22 +28,26 @@ do
     local cnt=-1
     local fn
     function new_mfile()
+        local file_exists=file.exists
         repeat cnt=cnt+1; fn="m/aa-"..cnt..".txt"
-        until not file.exists(fn)
+        until not file_exists(fn)
         return file.open(fn,"w")
     end
     local cmdi;
     function m_start()
+        local uart_on,uart_alt,uart_setup,uart_write = uart.on,uart.alt,uart.setup,uart.write
+        local string_byte,string_sub = string.byte,string.sub
+
         if cmdi then return end-- measurement already in progress
         local f=new_mfile()
         local cmds={"VER\r\n","fq15000000\r\n","sw30000000\r\n","frx1000\r\n"}
         cmdi=1
-        uart.alt(1)
-        uart.on("data","\n",function(data)
+        uart_alt(1)
+        uart_on("data","\n",function(data)
             f:write("<"..data)
-            if string.byte(data)==13 then data=string.sub(data,2) end
-            if string.byte(data,-2)==13 then data=string.sub(data,1,-3)
-            else data=string.sub(data,1,-2) end
+            if string_byte(data)==13 then data=string_sub(data,2) end
+            if string_byte(data,-2)==13 then data=string_sub(data,1,-3)
+            else data=string_sub(data,1,-2) end
             -- end of respone if:
             -- command is VER
             -- or data=="OK"
@@ -51,9 +55,9 @@ do
                 cmdi=cmdi+1
                 if cmdi > #cmds then
                     -- we executed all commands
-                    uart.on("data")
-                    uart.alt(0)
-                    uart.setup(0,unpack(defconfig))
+                    uart_on("data")
+                    uart_alt(0)
+                    uart_setup(0,unpack(defconfig))
                     --initTO:unregister()
                     --initTO=nil;
                     cmdi=nil
@@ -63,12 +67,12 @@ do
                     return
                 end
                 f:write(">"..cmds[cmdi])
-                uart.write(0,cmds[cmdi])
+                uart_write(0,cmds[cmdi])
             end
         end)
-        uart.setup(0,38400,8,uart.PARITY_NONE,uart.STOPBITS_1,0)
+        uart_setup(0,38400,8,uart.PARITY_NONE,uart.STOPBITS_1,0)
         f:write(">"..cmds[cmdi])
-        uart.write(0,cmds[cmdi])
+        uart_write(0,cmds[cmdi])
     end
 end
 
