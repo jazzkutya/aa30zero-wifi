@@ -46,6 +46,7 @@ do
         uart_on("data","\n",function(data)
             -- TODO reset the comTO timer
             -- TODO invert the green led
+            if not cmdi then return end -- no measurement in progress. probably aborted by a timeout
             f:write("<"..data)
             if string_byte(data)==13 then data=string_sub(data,2) end
             if string_byte(data,-2)==13 then data=string_sub(data,1,-3)
@@ -79,9 +80,12 @@ do
         -- TODO start blinking blue
         comTO=tmr.create()
         comTO:alarm(500,tmr.ALARM_SINGLE,function(timer)
+            cmdi=nil
             uart.on("data")
             uart.alt(0)
             uart.setup(0,unpack(defconfig))
+            f:close()
+            f=nil
             print("AA response timeout during measurement");
             comTO=nil
             -- TODO set led
