@@ -23,10 +23,41 @@ do
     uart.write(0,"off\r\n")
 end
 
+M_RUN=1
+M_ERROR=2
+M_SUCCESS=3
+do
+    local blinker
+    function setmled (newstate)
+        --wifistate=newstate
+        local r,g,b=1,1,1
+        if newstate==M_RUN then
+            -- blink blue led
+            if blinker==nil then
+                blinker=tmr.create()
+                blinker:alarm(300,tmr.ALARM_AUTO,function ()
+                    b=1-b
+                    gpio.write(P_MEAS_B,b)
+                end);
+            end
+        elseif newstate==M_ERROR then r=0
+        elseif newstate==M_SUCCESS then g=0
+        end
+        if newstate ~= M_RUN and blinker ~= nil then
+            blinker:unregister()
+            blinker=nil
+        end
+        gpio.write(P_MEAS_R,r)
+        gpio.write(P_MEAS_G,g)
+        gpio.write(P_MEAS_B,b)
+    end
+end
 do
     local cnt=-1
     local fn
     local comTO
+    local greens={gpio.HIGH,gpio.LOW}
+    local inputcnt=0
     function new_mfile()
         local file_exists=file.exists
         repeat cnt=cnt+1; fn="m/aa-"..cnt..".txt"
@@ -43,12 +74,15 @@ do
         local cmds={"VER\r\n","fq15000000\r\n","sw30000000\r\n","frx1000\r\n"}
         cmdi=1
         uart_alt(1)
+        inputcnt=0
         uart_on("data","\n",function(data)
             if not cmdi then return end -- no measurement in progress. probably aborted by a timeout
             -- reset the comTO timer
             comTO:stop()
             comTO:start()
-            -- TODO invert the green led
+            -- invert the green led
+            inputcnt=inputcnt+1
+            gpio.write(P_MEAS_G,greens[1+bit.band(inputcnt,1)])
             f:write("<"..data)
             if string_byte(data)==13 then data=string_sub(data,2) end
             if string_byte(data,-2)==13 then data=string_sub(data,1,-3)
@@ -68,7 +102,8 @@ do
                     cmdi=nil
                     f:close()
                     f=nil
-                    -- TODO set led
+                    -- set led
+                    setmled(M_SUCCESS)
                     print("AA measurement finished. file: "..fn);
                     return
                 end
@@ -79,7 +114,8 @@ do
         f=new_mfile()
         f:write(">"..cmds[cmdi])
         f:flush()
-        -- TODO start blinking blue
+        -- start blinking blue
+        setmled(M_RUN)
         comTO=tmr.create()
         comTO:alarm(500,tmr.ALARM_SINGLE,function(timer)
             cmdi=nil
@@ -90,7 +126,11 @@ do
             f=nil
             print("AA response timeout during measurement");
             comTO=nil
-            -- TODO set led
+            -- set led
+            setmled(M_ERROR)
+            gpio.write(P_WIFI_B,0)
+            gpio.write(P_WIFI_G,1)
+            gpio.write(P_WIFI_B,1)
         end)
         uart_setup(0,38400,8,uart.PARITY_NONE,uart.STOPBITS_1,0)
         uart_write(0,cmds[cmdi])
