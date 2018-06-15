@@ -44,9 +44,11 @@ do
         cmdi=1
         uart_alt(1)
         uart_on("data","\n",function(data)
-            -- TODO reset the comTO timer
-            -- TODO invert the green led
             if not cmdi then return end -- no measurement in progress. probably aborted by a timeout
+            -- reset the comTO timer
+            comTO:stop()
+            comTO:start()
+            -- TODO invert the green led
             f:write("<"..data)
             if string_byte(data)==13 then data=string_sub(data,2) end
             if string_byte(data,-2)==13 then data=string_sub(data,1,-3)
