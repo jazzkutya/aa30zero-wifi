@@ -66,7 +66,7 @@ working:
 * battery power
 * box
 * use sntp and use datetime for naming measurement files if available at time of measurement start
-* reset button? AA-30.ZERO has to be power down then up on a reset. Or just flick the power switch.
+* reset button? AA-30.ZERO has to be powered down then up on a reset. Or just flick the power switch.
 
 
 
