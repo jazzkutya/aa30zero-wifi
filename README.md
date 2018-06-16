@@ -47,6 +47,7 @@ working:
 * there is a "telnet server" to access the Lua interpreter, but stderr can not be redirected with current nodemcu-firmware so this is mosly useless
 * prefedined measurement: center frequency 15Mhz, range 30Mhz, 1001 points
 * LEDs for all of the above
+* AA-30.Zero communication timeout
 
 ## TODO
 
