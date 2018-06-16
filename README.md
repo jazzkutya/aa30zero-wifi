@@ -35,6 +35,9 @@ Measurement LED indicates status:
 * red: error happened
 * green: a measurement finished successfully
 
+Measurements are saved as m/aa-0.txt
+The number is inceremented for each new mesurement (actually it finds the first non-existent filename)
+
 ## Current state
 
 working:
@@ -62,3 +65,4 @@ working:
 * clarify end user setup in README
 * battery power
 * box
+* use sntp and use datetime for naming measurement files if available at time of measurement start
