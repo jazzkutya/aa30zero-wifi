@@ -22,7 +22,7 @@ WIFI LED indicates status:
 * blinking blue: connecting to an AP (a wifi network)
 * blue: connected to an AP
 * red: failed to connect to an AP
-* orange: in end user setup (see https://nodemcu.readthedocs.io/en/latest/en/modules/enduser-setup/ )
+* yellow: in end user setup (see https://nodemcu.readthedocs.io/en/latest/en/modules/enduser-setup/ )
 * magenta: error in end user setup
 
 
