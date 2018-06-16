@@ -48,6 +48,7 @@ working:
 * prefedined measurement: center frequency 15Mhz, range 30Mhz, 1001 points
 * LEDs for all of the above
 * AA-30.Zero communication timeout
+* working breadboard prototype
 
 ## TODO
 
